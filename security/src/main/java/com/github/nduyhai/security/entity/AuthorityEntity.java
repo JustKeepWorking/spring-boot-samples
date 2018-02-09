@@ -1,4 +1,4 @@
-package com.github.nduyhai.security;
+package com.github.nduyhai.security.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;

@@ -1,4 +1,4 @@
-package com.github.nduyhai.security;
+package com.github.nduyhai.security.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -19,6 +19,8 @@ public class UserEntity implements Serializable {
     private boolean credentialsNonExpired;
 
     private boolean enabled;
+
+    private Integer loginAttempt;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<AuthorityEntity> authorities;
@@ -77,5 +79,13 @@ public class UserEntity implements Serializable {
 
     public void setAuthorities(List<AuthorityEntity> authorities) {
         this.authorities = authorities;
+    }
+
+    public Integer getLoginAttempt() {
+        return loginAttempt;
+    }
+
+    public void setLoginAttempt(Integer loginAttempt) {
+        this.loginAttempt = loginAttempt;
     }
 }

@@ -1,5 +1,8 @@
-package com.github.nduyhai.security;
+package com.github.nduyhai.security.service;
 
+import com.github.nduyhai.security.entity.AuthorityEntity;
+import com.github.nduyhai.security.entity.UserEntity;
+import com.github.nduyhai.security.repository.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
