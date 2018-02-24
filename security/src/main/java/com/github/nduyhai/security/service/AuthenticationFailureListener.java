@@ -15,7 +15,7 @@ public class AuthenticationFailureListener implements ApplicationListener<Authen
 
     private UserRepository userRepository;
 
-    public static final int MAX_ATTEMPT = 2;
+    public static final int MAX_ATTEMPT = 3;
 
     public AuthenticationFailureListener(UserRepository userRepository) {
         this.userRepository = userRepository;
