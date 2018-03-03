@@ -9,6 +9,8 @@ import org.springframework.security.authentication.event.AuthenticationSuccessEv
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class AuthenticationSuccessEventListener implements ApplicationListener<AuthenticationSuccessEvent> {
     private static Logger LOG = LoggerFactory.getLogger(AuthenticationSuccessEventListener.class);
@@ -25,11 +27,15 @@ public class AuthenticationSuccessEventListener implements ApplicationListener<A
         final String username = event.getAuthentication().getName();
 
         LOG.info("{} login success from {}", username, auth.getRemoteAddress());
-        final UserEntity userEntity = this.userRepository.findOne(username);
+        final Optional<UserEntity> optionalEntity = this.userRepository.findById(username);
 
-        if (userEntity.getLoginAttempt() != null && userEntity.getLoginAttempt() != 0) {
-            userEntity.setLoginAttempt(0);
-            this.userRepository.save(userEntity);
+        if (optionalEntity.isPresent()) {
+            final UserEntity userEntity = optionalEntity.get();
+            if (userEntity.getLoginAttempt() != null && userEntity.getLoginAttempt() != 0) {
+                userEntity.setLoginAttempt(0);
+                this.userRepository.save(userEntity);
+            }
+
         }
     }
 }

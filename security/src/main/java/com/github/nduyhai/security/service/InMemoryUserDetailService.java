@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class InMemoryUserDetailService implements UserDetailsService {
@@ -70,10 +71,10 @@ public class InMemoryUserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        final UserEntity user = this.userRepository.findOne(username);
-        if (user != null) {
-            return new User(user.getUsername(), user.getPassword(), user.isEnabled(), user.isAccountNonExpired(), user.isCredentialsNonExpired(), user.isAccountNonLocked(),
-                    this.getGrantedAuthority(user.getAuthorities()));
+        final Optional<UserEntity> optionalEntity = this.userRepository.findById(username);
+        if (optionalEntity.isPresent()) {
+            final UserEntity user = optionalEntity.get();
+            return new User(user.getUsername(), user.getPassword(), user.isEnabled(), user.isAccountNonExpired(), user.isCredentialsNonExpired(), user.isAccountNonLocked(), this.getGrantedAuthority(user.getAuthorities()));
         } else {
             throw new UsernameNotFoundException(username);
         }

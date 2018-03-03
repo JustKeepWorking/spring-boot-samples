@@ -9,6 +9,8 @@ import org.springframework.security.authentication.event.AuthenticationFailureBa
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class AuthenticationFailureListener implements ApplicationListener<AuthenticationFailureBadCredentialsEvent> {
     private static Logger LOG = LoggerFactory.getLogger(AuthenticationFailureListener.class);
@@ -28,8 +30,9 @@ public class AuthenticationFailureListener implements ApplicationListener<Authen
         final String username = event.getAuthentication().getName();
         LOG.info("{} login fail from {}", username, auth.getRemoteAddress());
 
-        final UserEntity userEntity = this.userRepository.findOne(username);
-        if (userEntity != null) {
+        final Optional<UserEntity> optionalEntity = this.userRepository.findById(username);
+        if (optionalEntity.isPresent()) {
+            final UserEntity userEntity = optionalEntity.get();
             final Integer loginAttempt = userEntity.getLoginAttempt();
             userEntity.setLoginAttempt(loginAttempt == null ? 1 : loginAttempt + 1);
 
@@ -37,6 +40,8 @@ public class AuthenticationFailureListener implements ApplicationListener<Authen
                 userEntity.setAccountNonLocked(false);
             }
             this.userRepository.save(userEntity);
+        } else {
+            //Never?
         }
     }
 }
