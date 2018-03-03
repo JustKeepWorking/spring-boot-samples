@@ -10,27 +10,28 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import java.util.List;
 
 @Service
 public class SearchService {
 
-    private EntityManager entityManager;
+    private EntityManagerFactory factory;
 
     public static final String NAME_NGRAM_INDEX = "edgeNGramName";
     public static final String NAME_EDGE_NGRAM_INDEX = "nGramName";
     public static final String AUTHOR_NGRAM_INDEX = "edgeNGramAuthor";
     public static final String AUTHOR_EDGE_NGRAM_INDEX = "nGramAuthor";
 
-    @Autowired
-    public SearchService(EntityManager entityManager) {
-        this.entityManager = entityManager;
+    public SearchService(EntityManagerFactory factory) {
+        this.factory = factory;
     }
 
     @PostConstruct
     public void initHibernateSearch() {
         try {
-            FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(this.entityManager);
+            EntityManager em = factory.createEntityManager();
+            FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(em);
             fullTextEntityManager.createIndexer().startAndWait();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -39,7 +40,8 @@ public class SearchService {
 
     @Transactional
     public List<Book> fuzzy(String criteria, int limit) {
-        final FullTextEntityManager em = Search.getFullTextEntityManager(this.entityManager);
+        final EntityManager entityManager = this.factory.createEntityManager();
+        final FullTextEntityManager em = Search.getFullTextEntityManager(entityManager);
         final QueryBuilder qb = em.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
         final Query luceneQuery = qb.keyword().fuzzy()
                 .withEditDistanceUpTo(1)
@@ -56,7 +58,8 @@ public class SearchService {
 
     @Transactional
     public List<Book> search(String criteria, int limit) {
-        final FullTextEntityManager em = Search.getFullTextEntityManager(this.entityManager);
+        final EntityManager entityManager = this.factory.createEntityManager();
+        final FullTextEntityManager em = Search.getFullTextEntityManager(entityManager);
         final QueryBuilder qb = em.getSearchFactory().buildQueryBuilder().forEntity(Book.class).get();
         final Query luceneQuery = qb
                 .phrase().withSlop(2)
